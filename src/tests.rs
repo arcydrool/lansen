@@ -64,5 +64,5 @@ fn test(base: &str, stage: AdHoc) {
 
 #[test]
 fn test_sqlx() {
-    test("/sqlx", crate::sqlx::stage())
+    test("/moldspec", crate::moldspec::stage())
 }

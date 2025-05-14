@@ -2,3 +2,5 @@ Cargo.lock
 .sqlx/
 db/
 target/
+#static is output of vue build in lansen/lansen
+static/
