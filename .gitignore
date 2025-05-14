@@ -1,0 +1,4 @@
+Cargo.lock
+.sqlx/
+db/
+target/
