@@ -9,13 +9,13 @@ use futures::{stream::TryStreamExt, future::TryFutureExt};
 
 #[derive(Database)]
 #[database("sqlx")]
-struct Db(sqlx::SqlitePool);
+pub(super) struct Db(sqlx::SqlitePool);
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
-struct Post {
+pub(super) struct Post {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     id: Option<i64>,
     title: String,
@@ -64,13 +64,6 @@ pub(super) async fn delete(mut db: Connection<Db>, id: i64) -> Result<Option<()>
         .await?;
 
     Ok((result.rows_affected() == 1).then(|| ()))
-}
-
-#[delete("/")]
-async fn destroy(mut db: Connection<Db>) -> Result<()> {
-    sqlx::query!("DELETE FROM posts").execute(&mut **db).await?;
-
-    Ok(())
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
