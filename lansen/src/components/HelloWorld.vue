@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Contact from "./Contact.vue";
 defineProps<{
   msg: string
 }>()
@@ -13,6 +14,7 @@ defineProps<{
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>. What's next?
     </h3>
   </div>
+  <Contact />
 </template>
 
 <style scoped>
