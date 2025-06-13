@@ -23,7 +23,7 @@ struct Post {
 }
 
 #[post("/", data = "<post>")]
-async fn create(mut db: Connection<Db>, mut post: Json<Post>) -> Result<Created<Json<Post>>> {
+pub(super) async fn create(mut db: Connection<Db>, mut post: Json<Post>) -> Result<Created<Json<Post>>> {
     // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
     let results = sqlx::query!(
             "INSERT INTO posts (title, text) VALUES (?, ?) RETURNING id",
@@ -38,7 +38,7 @@ async fn create(mut db: Connection<Db>, mut post: Json<Post>) -> Result<Created<
 }
 
 #[get("/")]
-async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
+pub(super) async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
     let ids = sqlx::query!("SELECT id FROM posts")
         .fetch(&mut **db)
         .map_ok(|record| record.id)
@@ -49,7 +49,7 @@ async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
 }
 
 #[get("/<id>")]
-async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<Post>> {
+pub(super) async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<Post>> {
     sqlx::query!("SELECT id, title, text FROM posts WHERE id = ?", id)
         .fetch_one(&mut **db)
         .map_ok(|r| Json(Post { id: Some(r.id), title: r.title, text: r.text }))
@@ -58,7 +58,7 @@ async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<Post>> {
 }
 
 #[delete("/<id>")]
-async fn delete(mut db: Connection<Db>, id: i64) -> Result<Option<()>> {
+pub(super) async fn delete(mut db: Connection<Db>, id: i64) -> Result<Option<()>> {
     let result = sqlx::query!("DELETE FROM posts WHERE id = ?", id)
         .execute(&mut **db)
         .await?;

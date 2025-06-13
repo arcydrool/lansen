@@ -11,13 +11,14 @@ use rocket::response::Redirect;
 
 #[get("/")]
 fn index() -> Redirect {
-    Redirect::to(uri!("/moldspec", moldspec::list()))
+    Redirect::to(uri!("/index.html", moldspec::list()))
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index])
+        .mount("/moldspec", routes![moldspec::create,moldspec::list,moldspec::read,moldspec::delete] )
         .mount(
             "/",
             FileServer::new(relative!("static"), rocket::fs::Options::None),
