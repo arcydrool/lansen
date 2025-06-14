@@ -24,6 +24,6 @@ const mailLink = ref('info' + '@'.repeat(1) + 'lansen.com');
   color: white;
   text-align: center;
   font-family: Tahoma;
-  font-size: small;
+  font-size: x-small;
 }
 </style>
