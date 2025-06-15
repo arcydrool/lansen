@@ -1,22 +1,22 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import AboutView from '../views/AboutView.vue'
+import MoldView from '../views/MoldView.vue'
+import InjectView from '../views/InjectView.vue'
+import SpecimenView from '../views/SpecimenView.vue'
+import PlaqueView from '../views/PlaqueView.vue'
+import ContactView from '../views/ContactView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createMemoryHistory(),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
+    { path: '/', name: 'home', component: HomeView },
+    { path: '/about', name: 'about', component: AboutView },
+    { path: '/mold', name: 'mold', component: MoldView },
+    { path: '/mold', name: 'inject', component: InjectView },
+    { path: '/specimen', name: 'mold', component: SpecimenView },
+    { path: '/mold', name: 'plaque', component: PlaqueView },
+    { path: '/mold', name: 'contact', component: ContactView },
   ],
 })
 
