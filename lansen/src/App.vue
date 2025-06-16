@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {computed, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useHead } from '@vueuse/head'
 import { RouterLink, RouterView } from 'vue-router'
 import Menu from './components/Menu.vue'
 import Foot from './components/Foot.vue'
-
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
 
 
 const siteData = reactive({
@@ -22,7 +23,8 @@ useHead({
       name: 'description',
       content: computed(() => siteData.description),
     },
-    { name: 'keywords',
+    {
+      name: 'keywords',
       content: computed(() => siteData.keywords.join(", ")),
     }
   ],
@@ -30,10 +32,13 @@ useHead({
 </script>
 
 <template>
-
-  <Menu />
   <main>
+  <SplitterPanel class="flex items-center justify-center">
+    <Menu></Menu>
+  </SplitterPanel>
+  <SplitterPanel class="flex items-center justify-center">
     <RouterView />
+  </SplitterPanel>
   </main>
   <Foot />
 </template>

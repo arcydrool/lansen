@@ -10,13 +10,14 @@ import ContactView from '../views/ContactView.vue'
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/', name: 'home', component: HomeView },
+    { path: '/', name: 'index', component: HomeView },
+    { path: '/home', name: 'home', component: HomeView },
     { path: '/about', name: 'about', component: AboutView },
     { path: '/mold', name: 'mold', component: MoldView },
-    { path: '/mold', name: 'inject', component: InjectView },
-    { path: '/specimen', name: 'mold', component: SpecimenView },
-    { path: '/mold', name: 'plaque', component: PlaqueView },
-    { path: '/mold', name: 'contact', component: ContactView },
+    { path: '/inject', name: 'inject', component: InjectView },
+    { path: '/specimen', name: 'specimen', component: SpecimenView },
+    { path: '/plaque', name: 'plaque', component: PlaqueView },
+    { path: '/contact', name: 'contact', component: ContactView },
   ],
 })
 

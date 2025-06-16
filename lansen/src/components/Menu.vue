@@ -1,15 +1,39 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { reactive, computed } from 'vue';
+import PanelMenu from 'primevue/panelmenu';
+
+const items = computed(() => {
+      return [
+        { route: "home", label: "Home" },
+        { route: "about", label: "About Us" },
+        { route: "mold", label: "Custom Mold" },
+        { route: "inject", label: "Injection Molding" },
+        { route: "specimen", label: "Specimen Molding" },
+        { route: "plaque", label: "Plaque Molding" },
+        { route: "contact", label: "Contact" },
+      ]
+    })
 </script>
 
 <template>
-<nav>
-  <router-link :to="{ name: 'home' }">Home</router-link>
-  <router-link :to="{ name: 'about' }">About Us</router-link>
-  <router-link :to="{ name: 'mold' }">Custom Mold</router-link>
-  <router-link :to="{ name: 'inject' }">Injection Molding</router-link>
-  <router-link :to="{ name: 'specimen' }">Specimen Molding</router-link>
-  <router-link :to="{ name: 'plaque' }">Plaque Molding</router-link>
-  <router-link :to="{ name: 'contact' }">Contact</router-link>
-</nav>
+
+  <PanelMenu :model="items">
+    <template #item="{ item }">
+      <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+        <a v-ripple class="flex items-center cursor-pointer text-surface-700 dark:text-surface-0 px-4 py-2" :href="href"
+          @click="navigate">
+          <span :class="item.icon" />
+          <span class="ml-2">{{ item.label }}</span>
+        </a>
+      </router-link>
+      <a v-else v-ripple class="flex items-center cursor-pointer text-surface-700 dark:text-surface-0 px-4 py-2"
+        :href="item.url" :target="item.target">
+        <span :class="item.icon" />
+        <span class="ml-2">{{ item.label }}</span>
+        <span v-if="item.items" class="pi pi-angle-down text-primary ml-auto" />
+      </a>
+    </template>
+  </PanelMenu>
+
 </template>
