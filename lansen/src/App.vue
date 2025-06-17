@@ -4,8 +4,8 @@ import { useHead } from '@vueuse/head'
 import { RouterLink, RouterView } from 'vue-router'
 import Menu from './components/Menu.vue'
 import Foot from './components/Foot.vue'
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
+import Splitter from 'primevue/splitter'
+import SplitterPanel from 'primevue/splitterpanel'
 
 
 const siteData = reactive({
@@ -33,12 +33,14 @@ useHead({
 
 <template>
   <main>
-  <SplitterPanel class="flex items-center justify-center">
-    <Menu></Menu>
-  </SplitterPanel>
-  <SplitterPanel class="flex items-center justify-center">
-    <RouterView />
-  </SplitterPanel>
+    <Splitter class="mb-8">
+      <SplitterPanel :size="12" :minSize="5">
+        <Menu></Menu>
+      </SplitterPanel>
+      <SplitterPanel >
+        <RouterView />
+      </SplitterPanel>
+    </Splitter>
   </main>
   <Foot />
 </template>

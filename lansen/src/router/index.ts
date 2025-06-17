@@ -5,6 +5,7 @@ import MoldView from '../views/MoldView.vue'
 import InjectView from '../views/InjectView.vue'
 import SpecimenView from '../views/SpecimenView.vue'
 import PlaqueView from '../views/PlaqueView.vue'
+import QuoteView from '../views/QuoteView.vue'
 import ContactView from '../views/ContactView.vue'
 
 const router = createRouter({
@@ -17,6 +18,7 @@ const router = createRouter({
     { path: '/inject', name: 'inject', component: InjectView },
     { path: '/specimen', name: 'specimen', component: SpecimenView },
     { path: '/plaque', name: 'plaque', component: PlaqueView },
+    { path: '/quote', name: 'quote', component: QuoteView },
     { path: '/contact', name: 'contact', component: ContactView },
   ],
 })
