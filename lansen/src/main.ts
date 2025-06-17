@@ -23,7 +23,7 @@ app.use(router)
 app.use(head)
 app.use(PrimeVue, {
     theme: {
-        preset: Nora,
+        preset: MyPreset,
         options: {
         prefix: 'p',
         darkModeSelector: 'system',

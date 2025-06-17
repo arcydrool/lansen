@@ -45,6 +45,7 @@ import { RouterLink } from 'vue-router';
       <img src="photos/1267_b.jpg" width="212" height="143">
       <img src="photos/bar.jpg">
     -->
+      
     </template>
   </Card>
   <router-link to="/quote">Click here for specimen &amp; plaque product listing and to process a request for

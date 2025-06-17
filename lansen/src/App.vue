@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { useHead } from '@vueuse/head'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import Menu from './components/Menu.vue'
-import Foot from './components/Foot.vue'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
-
+import Foot from './components/Foot.vue'
 
 const siteData = reactive({
   title: 'Lansen Mold - Custom injection molder; mold design, manufacturing and repair; molding ISO and ASTM test specimens',
@@ -32,15 +31,29 @@ useHead({
 </script>
 
 <template>
+  
   <main>
     <Splitter class="mb-8">
       <SplitterPanel :size="12" :minSize="5">
         <Menu></Menu>
       </SplitterPanel>
-      <SplitterPanel >
+      <SplitterPanel>
         <RouterView />
       </SplitterPanel>
     </Splitter>
   </main>
-  <Foot />
+  <Foot></Foot>
 </template>
+<style>
+body {
+  font-family: Tahoma, Verdana, sans-serif;
+}
+
+h1 {
+  font-size: x-large;
+}
+
+h2 {
+  font-size: large;
+}
+</style>

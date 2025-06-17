@@ -12,6 +12,7 @@ const items = computed(() => {
         { route: "specimen", label: "Specimen Molding" },
         { route: "plaque", label: "Plaque Molding" },
         { route: "contact", label: "Contact" },
+        { route: "quote", label: "Quote" },
       ]
     })
 </script>

@@ -1,3 +1,3 @@
 <template>
-  <div>This is Plaque</div>
+  <div>This is Quote</div>
 </template>
