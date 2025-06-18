@@ -7,6 +7,7 @@ import SpecimenView from '../views/SpecimenView.vue'
 import PlaqueView from '../views/PlaqueView.vue'
 import QuoteView from '../views/QuoteView.vue'
 import ContactView from '../views/ContactView.vue'
+import DirectionsView from '@/views/DirectionsView.vue'
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -20,6 +21,7 @@ const router = createRouter({
     { path: '/plaque', name: 'plaque', component: PlaqueView },
     { path: '/quote', name: 'quote', component: QuoteView },
     { path: '/contact', name: 'contact', component: ContactView },
+    { path: '/directions', name: 'directions', component: DirectionsView },
   ],
 })
 

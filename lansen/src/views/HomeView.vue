@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Card from 'primevue/card';
-import { RouterLink } from 'vue-router';
 import Image from 'primevue/image';
 import i1267b from '../assets/1267_b.jpg';
 import ibar from '../assets/bar.jpg';
 import imfan from '../assets/molded_fan.jpg';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
+import GoForm from '@/components/GoForm.vue';
 </script>
 
 <template>
@@ -75,6 +75,5 @@ import SplitterPanel from 'primevue/splitterpanel';
       </Splitter>
     </template>
   </Card>
-  <router-link to="/quote">Click here for specimen &amp; plaque product listing and to process a request for
-    quotation.</router-link>
+  <GoForm />
 </template>

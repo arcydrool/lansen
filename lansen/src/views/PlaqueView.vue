@@ -6,6 +6,7 @@ import Iplaque from '@/assets/plaque.jpg';
 import IDisk from '@/assets/disk.jpg';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
+import GoForm from '@/components/GoForm.vue';
 
 </script>
 <template>
@@ -65,4 +66,5 @@ import SplitterPanel from 'primevue/splitterpanel';
       </Splitter>
     </template>
   </Card>
+  <GoForm />
 </template>

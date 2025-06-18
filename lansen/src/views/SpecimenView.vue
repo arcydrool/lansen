@@ -3,6 +3,7 @@ import Card from 'primevue/card';
 import Image from 'primevue/image';
 import Ispec from '@/assets/spec1.jpg';
 import Inquirer from '@/components/Inquirer.vue';
+import GoForm from '@/components/GoForm.vue';
 </script>
 <template>
   <h1>Specimen Molding</h1>
@@ -30,4 +31,5 @@ import Inquirer from '@/components/Inquirer.vue';
       <Image :src="Ispec" alt="Lansen Mold offers a variety of products."/>
     </template>
   </Card>
+  <GoForm />
 </template>
