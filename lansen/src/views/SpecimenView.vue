@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Card from 'primevue/card';
-import { RouterLink } from 'vue-router';
 import Image from 'primevue/image';
-import Ispec from '../assets/spec1.jpg';
+import Ispec from '@/assets/spec1.jpg';
+import Inquirer from '@/components/Inquirer.vue';
 </script>
 <template>
   <h1>Specimen Molding</h1>
@@ -12,15 +12,13 @@ import Ispec from '../assets/spec1.jpg';
       <ul>
         <li>We provide quick and thorough services for
           the testing industry. Our standard delivery is two to three weeks. Quicker deliveries
-          maybe available after a project review.&nbsp;</li>
-        <li>We respond to all inquirers within 24 hours.
-          Please fill out our <router-link to="/quote"> online quotation form</router-link>
-          or call John Rosier at <a href="tel:+14134435328">(413)443-5328</a>.</li>
+          maybe available after a project review.</li>
+        <Inquirer />
         <li>ISO and ASTM family molds are balanced per
           standards on mold design ISO 294 and ASTM D3641.</li>
         <li>Pricing starting at $390.00, includes 2 hours
           of processing, tool setup, material handling and completed ?as molded? process
-          sheet for each material type.&nbsp;</li>
+          sheet for each material type.</li>
         <li>Over 45 years experience in molding test specimens.</li>
         <li>Our injection molding machines and inspection equipment are calibrated and
           certified yearly.</li>

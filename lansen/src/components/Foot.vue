@@ -10,7 +10,7 @@ const mailLink = ref('info' + '@'.repeat(1) + 'lansen.com');
       1 Main St., Berkshire MA 01224<br>
       Mail: P.O. Box 1481<br>
       Lanesboro, MA 01237<br>
-      Tel:(413)443-5328 - Fax: (413)443-2688<br>
+      Tel: <a href="tel:+14134435328">(413)443-5328</a> - Fax: <a href="fax:+14134432688" >(413)443-2688</a><br>
       <a v-bind:href="'mailto:' + mailLink">{{ mailLink }}</a>
     </template>
   </Card>
