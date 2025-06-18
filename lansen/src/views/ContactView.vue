@@ -1,24 +1,55 @@
 <script setup lang="ts">
 import GoForm from '@/components/GoForm.vue';
 import { Card, Button, InputText, InputMask, Textarea, Message, Checkbox, CheckboxGroup } from 'primevue';
-import { Form } from '@primevue/forms';
+import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { ref } from 'vue';
 
 const mailLink = ref('info' + '@'.repeat(1) + 'lansen.com');
 const initialValues = ref();
 const resolver = ref();
-const onFormSubmit = ({ valid }:{valid: boolean}) => {
-    if (valid) {
-        1;
-    }
+const onFormSubmit = ({ valid }: { valid: boolean }) => {
+  if (valid) {
+    1;
+  }
 };
+
+interface NoblePayload {
+  name: string;
+  company: string;
+  email: string;
+  tel: string;
+  mail: string;
+  interests: Array<String>;
+  additional: string;
+}
+
+async function postJson(url: string, data: NoblePayload): Promise<Response> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Blast! Our letter was not received favorably: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
+async function postContact(form: FormSubmitEvent): Promise<Response> {
+  const payload: NoblePayload = { name: form.states.name.value, email: form.states.email.value, tel: form.states.tel.value, company: form.states.company.value, mail: form.states.mail.value, interests: form.states.interests.value, additional: form.states.additional.value, };
+  return await postJson("", payload);
+}
 </script>
 <template>
   <Card>
     <template #header>Contact Us</template>
     <template #content>
       <ul>
-        <li>Driving directions to Lansen Mold. Separate instructions for large vehicles. <RouterLink to="/directions">Driving Directions
+        <li>Driving directions to Lansen Mold. Separate instructions for large vehicles. <RouterLink to="/directions">
+            Driving Directions
           </RouterLink>
         </li>
         <li>Reach us by phone. Call 413-443-5328 and ask for Kari Kristensen.
@@ -26,7 +57,9 @@ const onFormSubmit = ({ valid }:{valid: boolean}) => {
         <li>Reach us via E-mail.
           <a v-bind:href="'mailto:' + mailLink">{{ mailLink }}</a>
         </li>
-        <li>Request a quote. <GoForm /></li>
+        <li>Request a quote.
+          <GoForm />
+        </li>
         <li>Our standard contact form. Fill out the contact page below and we will respond to your request.</li>
       </ul>
 
@@ -35,7 +68,7 @@ const onFormSubmit = ({ valid }:{valid: boolean}) => {
   <Card>
     <template #header>Contact Form:</template>
     <template #content>
-     <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit" >
+      <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit.default="postContact">
         <label for="name">Name</label>
         <InputText name="name" placeholder="Name" fluid />
         <label for="company">Company</label>
@@ -65,7 +98,7 @@ Berkshire, MA, 01224"></Textarea>
         </div>
         <div class="flex flex-col gap-2">
           <label for="additional">Comments Or Questions</label><br>
-          <Textarea id="mail" size="large" rows="5" placeholder="Additional Details"></Textarea>
+          <Textarea id="additional" size="large" rows="5" placeholder="Additional Details"></Textarea>
         </div>
         <Button type="submit" severity="secondary" label="Submit" fluid></Button>
       </Form>
