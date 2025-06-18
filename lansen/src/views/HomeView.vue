@@ -10,13 +10,12 @@ import SplitterPanel from 'primevue/splitterpanel';
 </script>
 
 <template>
+  <h1>Custom Injection Molds, Engineering:</h1>
+  <h2>Custom Injection molder supplying
+    the plastics industry with cost effective solutions to molding and tooling needs.</h2>
   <Card>
-    <template #title>Custom Injection Molds, Engineering:</template>
+    <template #title>Summary of services provided at Lansen Mold:</template>
     <template #content>
-      <h1>
-        Custom Injection molder supplying
-        the plastics industry with cost effective solutions to molding and tooling needs.</h1>
-      <h2>Summary of services provided at Lansen Mold:</h2>
       <Splitter :gutter-size="0">
         <SplitterPanel>
           <ul>
@@ -25,9 +24,15 @@ import SplitterPanel from 'primevue/splitterpanel';
             <li>Mold manufacturing, prototyping, evaluation, and production tooling.</li>
           </ul>
         </SplitterPanel>
-        <SplitterPanel><Image :src="imfan" /></SplitterPanel>
+        <SplitterPanel>
+          <Image :src="imfan" />
+        </SplitterPanel>
       </Splitter>
-      <h2>Injection Molding:</h2>
+    </template>
+  </Card>
+  <Card>
+    <template #title>Injection Molding:</template>
+    <template #content>
       <Splitter :gutter-size="0">
         <SplitterPanel>
           <ul>
@@ -37,9 +42,15 @@ import SplitterPanel from 'primevue/splitterpanel';
             <li>Warehousing of raw materials and finished goods.</li>
           </ul>
         </SplitterPanel>
-        <SplitterPanel><Image :src="i1267b" /></SplitterPanel>
+        <SplitterPanel>
+          <Image :src="i1267b" />
+        </SplitterPanel>
       </Splitter>
-      <h2>Specimen and Plaque Molding:</h2>
+    </template>
+  </Card>
+  <Card>
+    <template #title>Specimen and Plaque Molding:</template>
+    <template #content>
       <Splitter :gutter-size="0">
         <SplitterPanel>
           <ul>
@@ -58,16 +69,10 @@ import SplitterPanel from 'primevue/splitterpanel';
             <li>Flow Length</li>
           </ul>
         </SplitterPanel>
-        <SplitterPanel><Image :src="ibar" /></SplitterPanel>
+        <SplitterPanel>
+          <Image :src="ibar" />
+        </SplitterPanel>
       </Splitter>
-
-      <!-- TODO: PHOTOS
-      <img src="photos/molded_fan.jpg" width="228" height="184">
-
-      
-      <img src="photos/bar.jpg">
-    -->
-
     </template>
   </Card>
   <router-link to="/quote">Click here for specimen &amp; plaque product listing and to process a request for
