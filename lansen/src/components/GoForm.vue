@@ -2,6 +2,6 @@
 import { RouterLink } from 'vue-router';
 </script>
 <template>
-    <router-link to="/quote">Click here for specimen &amp; plaque product listing and to process a request for
-    quotation.</router-link>
+    <router-link to="quote">Specimen &amp; plaque product listing and Requests for
+        quotation.</router-link>
 </template>
