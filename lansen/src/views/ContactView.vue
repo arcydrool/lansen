@@ -4,6 +4,7 @@ import { ref, reactive } from 'vue';
 import ProgressSpinner from 'primevue/progressspinner';
 
 import { defineAsyncComponent } from 'vue'
+import GoForm from '@/components/GoForm.vue';
 const spin = reactive({ spin: 1 });
 const Contact = defineAsyncComponent(() => { var v = import('@/components/Contact.vue'); spin.spin = 0; return v });
 const mailLink = ref('info' + '@'.repeat(1) + 'lansen.com');

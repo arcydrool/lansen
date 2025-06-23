@@ -3,32 +3,63 @@ import { reactive, ref } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
 import { Card, Button, InputText, InputMask, Textarea, Message, Checkbox, CheckboxGroup } from 'primevue';
-import { Form, type FormSubmitEvent } from '@primevue/forms';
+import { Form, FormField, type FormSubmitEvent } from '@primevue/forms';
+
+const state = reactive({ summary: "", severity: "" });
 
 const initialValues = reactive({
-    name: '',
-    company: '',
-    email: '',
-    tel: '',
-    interests: [],
-    additional: ''
+  name: '',
+  company: '',
+  email: '',
+  tel: '',
+  interests: [],
+  additional: ''
 });
+
 const resolver = zodResolver(
-    z.object({
-        name: z.string(),
-        company: z.string(),
-        email: z.string(),
-        tel: z.string(),
-        mail: z.string(),
-        interests: z.array(z.string()).min(1,"Please Select At Least One Interest"),
-        additional: z.string()
-    })
+  z.object({
+    name: z.string().min(1, "Please provide a name"),
+    company: z.string().min(1, "Please provide a company"),
+    email: z.string().email(),
+    tel: z.string(),
+    mail: z.string(),
+    interests: z.array(z.string()).min(1, "Please Select At Least One Interest"),
+    additional: z.string()
+  })
 );
-const onFormSubmit = ({ valid }: { valid: boolean }) => {
-  if (valid) {
-    1;
+const onFormSubmit = (submitEvent: FormSubmitEvent): FormSubmitEvent => {
+  if (submitEvent.valid) {
+    const itemStr = localStorage.getItem('csub');
+    let itemStr2: Object | null = null;
+    if (itemStr) {
+      const item = JSON.parse(itemStr);
+      const now = new Date();
+      const expiry = new Date(item.expiry);
+
+      if (now.getTime() > expiry.getTime()) {
+        localStorage.removeItem('csub');
+      } else {
+        itemStr2 = itemStr;
+        state.severity = 'wait';
+        state.summary = 'We ask that you use the contact form no more than once per day. [' + expiry.toLocaleDateString() + ' ' + expiry.toLocaleTimeString() + ']';
+      }
+    }
+    if (!itemStr2) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      const item = {
+        value: 1,
+        expiry: tomorrow,
+      };
+      localStorage.setItem('csub', JSON.stringify(item));
+      state.severity = 'success';
+      state.summary = 'Form is submitted. We will contact you shortly.';
+    }
   }
-};
+  return submitEvent
+}
 
 interface NoblePayload {
   name: string;
@@ -56,29 +87,51 @@ async function postJson(url: string, data: NoblePayload): Promise<Response> {
 }
 
 async function postContact(form: FormSubmitEvent): Promise<Response> {
-  const payload: NoblePayload = { name: form.states.name.value, email: form.states.email.value, tel: form.states.tel.value, company: form.states.company.value, mail: form.states.mail.value, interests: form.states.interests.value, additional: form.states.additional.value, };
+  const payload: NoblePayload = { name: form.states.name?.value, email: form.states.email?.value, tel: form.states.tel?.value, company: form.states.company?.value, mail: form.states.mail?.value, interests: form.states.interests?.value, additional: form.states.additional?.value, };
   return await postJson("", payload);
 }
 </script>
 <template>
-<Card>
+  <Card>
     <template #header>Contact Form:</template>
     <template #content>
-      <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit.default="postContact">
-        <label for="name">Name</label>
-        <InputText name="name" placeholder="Name" fluid />
-        <label for="company">Company</label>
-        <InputText name="company" placeholder="Company" fluid />
-        <label for="email">Email</label>
-        <InputText id="email" placeholder="email@domain.com" fluid />
-        <label for="tel">Telephone</label>
-        <InputMask id="tel" mask="999-999-9999" placeholder="413-555-5555" fluid />
-        <label for="mail">Address</label><br>
-        <Textarea id="mail" size="large" rows="5" placeholder="Business
+      <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit.default="onFormSubmit">
+        <FormField as="section" name="name" initialValue="">
+          <label for="name">Name</label>
+          <InputText inputId="name" placeholder="Name" fluid />
+          <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">{{ $form.name.error.message
+          }}</Message>
+        </FormField>
+        <FormField as="company" name="company" initialValue="">
+          <label for="company">Company</label>
+          <InputText inputId="company" placeholder="Company" fluid />
+          <Message v-if="$form.company?.invalid" severity="error" size="small" variant="simple">{{
+            $form.company.error.message }}</Message>
+        </FormField>
+        <FormField as="email" name="email" initialValue="">
+          <label for="email">Email</label>
+          <InputText inputId="email" placeholder="email@domain.com" fluid />
+          <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
+            $form.email.error.message
+          }}</Message>
+        </FormField>
+        <FormField as="tel" name="tel" initialValue="">
+          <label for="tel">Telephone</label>
+          <InputMask inputId="tel" mask="999-999-9999" placeholder="413-555-5555" fluid />
+          <Message v-if="$form.tel?.invalid" severity="error" size="small" variant="simple">{{ $form.tel.error.message
+          }}
+          </Message>
+        </FormField>
+        <FormField as="mail" name="mail" initialValue="">
+
+          <label for="mail">Address</label><br>
+          <Textarea inputId="mail" size="large" rows="5" placeholder="Business
 1 Street Address
 Berkshire, MA, 01224"></Textarea>
+        </FormField>
         <div class="flex flex-col gap-2 border-2">
-          <label for="interests">Interests</label>
+          <Message v-if="$form.interests?.invalid" severity="error" size="small" variant="simple">{{
+            $form.interests.error.message }}</Message>
           <CheckboxGroup name="interests">
             <Checkbox inputId="custom" value="custom" />
             <label for="custom"> Custom Molds </label>
@@ -91,12 +144,19 @@ Berkshire, MA, 01224"></Textarea>
             <Checkbox inputId="other" value="other" />
             <label for="other"> Other </label>
           </CheckboxGroup>
+
         </div>
-        <div class="flex flex-col gap-2">
+        <FormField as="additional" name="additional" initialValue="" class="flex felx-col gap-2">
           <label for="additional">Comments Or Questions</label><br>
-          <Textarea id="additional" size="large" rows="5" placeholder="Additional Details"></Textarea>
-        </div>
-        <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">{{ $form.name.error.message }}</Message>
+          <Textarea inputId="additional" size="large" rows="5" placeholder="Additional Details"></Textarea>
+          <Message v-if="$form.additional?.invalid" severity="error" size="small" variant="simple">{{
+            $form.additional.error.message }}</Message>
+        </FormField>
+
+        <Message v-if="state.severity == 'wait'" severity="error" size="small" variant="outlined">{{
+          state.summary }}</Message>
+        <Message v-if="state.severity == 'success'" severity="success" variant="outlined">{{
+          state.summary }}</Message>
         <Button type="submit" severity="secondary" label="Submit" fluid></Button>
       </Form>
     </template>
