@@ -4,6 +4,7 @@ extern crate rocket;
 #[cfg(test)]
 mod tests;
 
+mod contact;
 mod moldspec;
 
 use rocket::fs::{relative, FileServer};
@@ -18,10 +19,21 @@ fn index() -> Redirect {
 fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index])
-        .mount("/moldspec", routes![moldspec::create,moldspec::list,moldspec::read,moldspec::delete] )
+        .mount(
+            "/moldspec",
+            routes![
+                moldspec::create,
+                moldspec::list,
+                moldspec::read,
+                moldspec::delete
+            ],
+        )
+        .register("/c", catchers![contact::default])
+        .mount("/c", routes![contact::create])
         .mount(
             "/",
             FileServer::new(relative!("static"), rocket::fs::Options::None),
         )
         .attach(moldspec::stage())
+        .attach(contact::stage())
 }

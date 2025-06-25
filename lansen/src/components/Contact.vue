@@ -103,7 +103,7 @@ async function postJson(url: string, data: NoblePayload): Promise<Response> {
 async function postContact(form: FormSubmitEvent): Promise<Response> {
   const payload: NoblePayload = { name: form.states.name?.value, email: form.states.email?.value, tel: form.states.tel?.value, company: form.states.company?.value, mail: form.states.mail?.value, interests: form.states.interests?.value, additional: form.states.additional?.value, };
   console.log(payload);
-  return await postJson("/ct", payload);
+  return await postJson("/c", payload);
 }
 </script>
 <template>
