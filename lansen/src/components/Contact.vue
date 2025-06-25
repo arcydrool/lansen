@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
 import { Card, Button, InputText, InputMask, Textarea, Message, Checkbox, CheckboxGroup } from 'primevue';
@@ -20,11 +20,11 @@ const resolver = zodResolver(
   z.object({
     name: z.string().min(1, "Please provide a name"),
     company: z.string().min(1, "Please provide a company"),
-    email: z.string().email(),
-    tel: z.string(),
-    mail: z.string(),
+    email: z.string().email("Please provide an e-mail"),
+    tel: z.string().optional(),
+    mail: z.string().optional(),
     interests: z.array(z.string()).min(1, "Please Select At Least One Interest"),
-    additional: z.string()
+    additional: z.string().optional()
   })
 );
 const onFormSubmit = (submitEvent: FormSubmitEvent): FormSubmitEvent => {
@@ -40,8 +40,8 @@ const onFormSubmit = (submitEvent: FormSubmitEvent): FormSubmitEvent => {
         localStorage.removeItem('csub');
       } else {
         itemStr2 = itemStr;
-        state.severity = 'wait';
         state.summary = 'We ask that you use the contact form no more than once per day. [' + expiry.toLocaleDateString() + ' ' + expiry.toLocaleTimeString() + ']';
+        state.severity = 'wait';
       }
     }
     if (!itemStr2) {
@@ -53,9 +53,23 @@ const onFormSubmit = (submitEvent: FormSubmitEvent): FormSubmitEvent => {
         value: 1,
         expiry: tomorrow,
       };
-      localStorage.setItem('csub', JSON.stringify(item));
-      state.severity = 'success';
-      state.summary = 'Form is submitted. We will contact you shortly.';
+      try {
+        const result = postContact(submitEvent);
+        result
+          .then((data) => {
+            localStorage.setItem('csub', JSON.stringify(item));
+            state.summary = 'Form is submitted. We will contact you shortly.';
+            state.severity = 'success';
+          })
+          .catch((error) => {
+            state.summary = 'Form submission failed. Please contact us a different way.';
+            state.severity = 'fail';
+          });
+
+      } catch (error) {
+        state.summary = 'Form submission failed. Please contact us a different way.';
+        state.severity = 'fail';
+      }
     }
   }
   return submitEvent
@@ -88,7 +102,8 @@ async function postJson(url: string, data: NoblePayload): Promise<Response> {
 
 async function postContact(form: FormSubmitEvent): Promise<Response> {
   const payload: NoblePayload = { name: form.states.name?.value, email: form.states.email?.value, tel: form.states.tel?.value, company: form.states.company?.value, mail: form.states.mail?.value, interests: form.states.interests?.value, additional: form.states.additional?.value, };
-  return await postJson("", payload);
+  console.log(payload);
+  return await postJson("/ct", payload);
 }
 </script>
 <template>
@@ -152,10 +167,11 @@ Berkshire, MA, 01224"></Textarea>
           <Message v-if="$form.additional?.invalid" severity="error" size="small" variant="simple">{{
             $form.additional.error.message }}</Message>
         </FormField>
-
-        <Message v-if="state.severity == 'wait'" severity="error" size="small" variant="outlined">{{
+        <Message v-if="state.severity == 'wait'" severity="warn" size="small" variant="outlined">{{
           state.summary }}</Message>
         <Message v-if="state.severity == 'success'" severity="success" variant="outlined">{{
+          state.summary }}</Message>
+        <Message v-if="state.severity == 'fail'" severity="error" size="small" variant="outlined">{{
           state.summary }}</Message>
         <Button type="submit" severity="secondary" label="Submit" fluid></Button>
       </Form>
