@@ -5,6 +5,7 @@ extern crate rocket;
 mod tests;
 
 mod contact;
+mod mail;
 mod moldspec;
 
 use rocket::fs::{relative, FileServer};
@@ -36,4 +37,5 @@ fn rocket() -> _ {
         )
         .attach(moldspec::stage())
         .attach(contact::stage())
+        .attach(mail::stage())
 }

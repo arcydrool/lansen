@@ -5,6 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
+lettre = "0.11.17"
 rocket = { version = "0.5.1", features = ["json"] }
 
 [dependencies.sqlx]
