@@ -1,7 +1,7 @@
-use lettre::transport::smtp::Error;
+//use lettre::transport::smtp::Error;
 use rocket::fairing::{self, AdHoc};
 use rocket::tokio::{task, time};
-use rocket::{Build, Rocket, Orbit};
+use rocket::{Build, Rocket};
 use std::sync::Mutex;
 use std::time::Duration;
 
