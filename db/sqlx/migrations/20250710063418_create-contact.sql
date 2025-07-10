@@ -1,0 +1,11 @@
+CREATE TABLE contact (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR NOT NULL,
+    company VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    tel VARCHAR NOT NULL,
+    interests VARCHAR NOT NULL,
+    additional VARCHAR NOT NULL,
+    raising BOOLEAN NOT NULL DEFAULT 0,
+    raised BOOLEAN NOT NULL DEFAULT 0
+);

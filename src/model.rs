@@ -13,7 +13,7 @@ type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
-pub(crate) struct MoldPost {
+pub(crate) struct QuotePost {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     id: Option<i64>,
     title: String,
@@ -22,14 +22,14 @@ pub(crate) struct MoldPost {
     raised: bool,
 }
 
-impl MoldPost {
+impl QuotePost {
     pub(crate) async fn create(
         mut db: Connection<Db>,
-        mut post: Json<MoldPost>,
-    ) -> Result<Created<Json<MoldPost>>> {
+        mut post: Json<QuotePost>,
+    ) -> Result<Created<Json<QuotePost>>> {
         // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
         let results = sqlx::query!(
-            "INSERT INTO posts (title, text) VALUES (?, ?) RETURNING id",
+            "INSERT INTO quote (title, text) VALUES (?, ?) RETURNING id",
             post.title,
             post.text
         )
@@ -41,7 +41,7 @@ impl MoldPost {
         return Ok(Created::new("/").body(post));
     }
     pub(crate) async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
-        let ids = sqlx::query!("SELECT id FROM posts")
+        let ids = sqlx::query!("SELECT id FROM quote where raising = 0 and raised = 0")
             .fetch(&mut **db)
             .map_ok(|record| record.id)
             .try_collect::<Vec<_>>()
@@ -50,14 +50,14 @@ impl MoldPost {
         Ok(Json(ids))
     }
 
-    pub(crate) async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<MoldPost>> {
+    pub(crate) async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<QuotePost>> {
         sqlx::query!(
-            "SELECT id, title, text, raising, raised FROM posts WHERE id = ?",
+            "SELECT id, title, text, raising, raised FROM quote WHERE id = ?",
             id
         )
         .fetch_one(&mut **db)
         .map_ok(|r| {
-            Json(MoldPost {
+            Json(QuotePost {
                 id: Some(r.id),
                 title: r.title,
                 text: r.text,
