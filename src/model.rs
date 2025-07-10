@@ -1,0 +1,92 @@
+use futures::{future::TryFutureExt, stream::TryStreamExt};
+use rocket::fairing::{self, AdHoc};
+use rocket::response::status::Created;
+use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::{futures, Build, Rocket};
+use rocket_db_pools::{sqlx, Connection, Database};
+
+#[derive(Database)]
+#[database("sqlx")]
+pub struct Db(sqlx::SqlitePool);
+
+type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(crate = "rocket::serde")]
+pub(super) struct MoldPost {
+    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
+    id: Option<i64>,
+    title: String,
+    text: String,
+    raising: bool,
+    raised: bool,
+}
+
+impl MoldPost {
+    pub async fn create(
+        mut db: Connection<Db>,
+        mut post: Json<MoldPost>,
+    ) -> Result<Created<Json<MoldPost>>> {
+        // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
+        let results = sqlx::query!(
+            "INSERT INTO posts (title, text) VALUES (?, ?) RETURNING id",
+            post.title,
+            post.text
+        )
+        .fetch(&mut **db)
+        .try_collect::<Vec<_>>()
+        .await?;
+
+        post.id = Some(results.first().expect("returning results").id);
+        return Ok(Created::new("/").body(post));
+    }
+    pub(super) async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
+        let ids = sqlx::query!("SELECT id FROM posts")
+            .fetch(&mut **db)
+            .map_ok(|record| record.id)
+            .try_collect::<Vec<_>>()
+            .await?;
+
+        Ok(Json(ids))
+    }
+
+    pub async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<MoldPost>> {
+        sqlx::query!(
+            "SELECT id, title, text, raising, raised FROM posts WHERE id = ?",
+            id
+        )
+        .fetch_one(&mut **db)
+        .map_ok(|r| {
+            Json(MoldPost {
+                id: Some(r.id),
+                title: r.title,
+                text: r.text,
+                raising: r.raising,
+                raised: r.raised,
+            })
+        })
+        .await
+        .ok()
+    }
+}
+
+async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
+    match Db::fetch(&rocket) {
+        Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
+            Ok(_) => Ok(rocket),
+            Err(e) => {
+                error!("Failed to initialize SQLx database: {}", e);
+                Err(rocket)
+            }
+        },
+        None => Err(rocket),
+    }
+}
+
+pub fn stage() -> AdHoc {
+    AdHoc::on_ignite("SQLx Stage", |rocket| async {
+        rocket
+            .attach(Db::init())
+            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
+    })
+}

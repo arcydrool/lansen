@@ -1,7 +1,7 @@
 use lettre::transport::smtp::Error;
 use rocket::fairing::{self, AdHoc};
 use rocket::tokio::{task, time};
-use rocket::{Build, Rocket};
+use rocket::{Build, Rocket, Orbit};
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -36,6 +36,7 @@ impl MailyTask {
             None => Some(forever)
         }
     }
+
 }
 
 async fn send_pending_emails() {

@@ -4,6 +4,7 @@ extern crate rocket;
 #[cfg(test)]
 mod tests;
 
+mod model;
 mod contact;
 mod mail;
 mod moldspec;
@@ -25,8 +26,7 @@ fn rocket() -> _ {
             routes![
                 moldspec::create,
                 moldspec::list,
-                moldspec::read,
-                moldspec::delete
+                moldspec::read
             ],
         )
         .register("/c", catchers![contact::default])
@@ -34,8 +34,7 @@ fn rocket() -> _ {
         .mount(
             "/",
             FileServer::new(relative!("static"), rocket::fs::Options::None),
-        )
-        .attach(moldspec::stage())
+        ).attach(model::stage())
         .attach(contact::stage())
         .attach(mail::stage())
 }
