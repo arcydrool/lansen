@@ -35,6 +35,5 @@ fn rocket() -> _ {
             "/",
             FileServer::new(relative!("static"), rocket::fs::Options::None),
         ).attach(model::stage())
-        .attach(contact::stage())
         .attach(mail::stage())
 }
