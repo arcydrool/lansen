@@ -1,6 +1,6 @@
 Cargo.lock
 .sqlx/
-/db/sqlx/db.sqlite
+/db/sqlx/db.sqlite*
 target/
 #static is output of vue build in lansen/lansen
 static/

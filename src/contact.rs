@@ -1,6 +1,6 @@
 use rocket::http::Status;
 use rocket::response::status::Created;
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::serde::json::Json;
 use rocket::Request;
 
 use rocket_db_pools::{sqlx, Connection};
@@ -8,19 +8,6 @@ use rocket_db_pools::{sqlx, Connection};
 use crate::model::{Contact, Db};
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(crate = "rocket::serde")]
-pub(super) struct Post {
-    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
-    id: Option<i64>,
-    name: String,
-    company: String,
-    email: String,
-    tel: String,
-    interests: Vec<String>,
-    additional: String,
-}
 
 #[catch(default)]
 pub(super) fn default(status: Status, req: &Request) -> String {

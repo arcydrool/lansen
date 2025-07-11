@@ -112,7 +112,7 @@ impl Contact {
         let vinterests = post.interests.clone();
         let interests: String = post.interests.join(",");
         let query = sqlx::query!(
-            "INSERT INTO contacts (id, name, company, email, tel, interests, additional) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id", 
+            "INSERT INTO contact (id, name, company, email, tel, interests, additional) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id", 
             post.id, post.name, post.company, post.email, post.tel, interests, post.additional);
         let results = query.fetch(&mut **db).try_collect::<Vec<_>>().await?;
         let results = results.first();
