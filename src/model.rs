@@ -70,27 +70,6 @@ impl QuotePost {
     }
 }
 
-async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
-    match Db::fetch(&rocket) {
-        Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
-            Ok(_) => Ok(rocket),
-            Err(e) => {
-                error!("Failed to initialize SQLx database: {}", e);
-                Err(rocket)
-            }
-        },
-        None => Err(rocket),
-    }
-}
-
-pub fn stage() -> AdHoc {
-    AdHoc::on_ignite("SQLx Stage", |rocket| async {
-        rocket
-            .attach(Db::init())
-            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-    })
-}
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub(crate) struct Contact {
@@ -132,4 +111,79 @@ impl Contact {
             None => Err(rocket::response::Debug(sqlx::Error::RowNotFound)),
         }
     }
+
+    pub(crate) async fn find(mut db: Connection<Db>, id: i64) -> Result<Contact> {
+        let query = sqlx::query!(
+            "
+          select id, name, company, email, tel, interests, additional, raising, raised 
+            from contact where id = ?",
+            id
+        );
+        let record = query.fetch_one(&mut **db).await;
+        match record {
+            Ok(row) => {
+                let interests = row.interests.split(",").map(|c| c.to_string()).collect();
+                Ok(Contact {
+                    id: Some(row.id),
+                    name: row.name,
+                    company: row.company,
+                    email: row.email,
+                    tel: row.tel,
+                    interests: interests,
+                    additional: row.additional,
+                    raising: row.raising,
+                    raised: row.raised,
+                })
+            }
+            Err(e) => Err(rocket::response::Debug(e)),
+        }
+    }
+    pub(crate) async fn find_raising_contact(mut db: Connection<Db>) -> Result<Option<Contact>> {
+        let query = sqlx::query!(
+            "
+            update contact  
+              set raising = true where raising = 0 and raised = 0 
+              and not exists ( 
+                select 1 from contact cc 
+                where cc.id < id and raising = 0 and raised = 0 ) 
+            returning id "
+        );
+        let result = query.fetch_optional(&mut **db).await;
+
+        match result{
+            Err(e) => Err(rocket::response::Debug(e)),
+            Ok(some_rec) => {
+                match some_rec {
+                    None => Ok(None),
+                    Some(rec) => { let contact = Contact::find(db, rec.id.unwrap_or_default()).await;
+                        match contact {
+                            Err(e) => Err(e),
+                            Ok(contact ) => Ok(Some(contact))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
+    match Db::fetch(&rocket) {
+        Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
+            Ok(_) => Ok(rocket),
+            Err(e) => {
+                error!("Failed to initialize SQLx database: {}", e);
+                Err(rocket)
+            }
+        },
+        None => Err(rocket),
+    }
+}
+
+pub fn stage() -> AdHoc {
+    AdHoc::on_ignite("SQLx Stage", |rocket| async {
+        rocket
+            .attach(Db::init())
+            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
+    })
 }
