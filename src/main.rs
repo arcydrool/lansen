@@ -17,8 +17,8 @@ fn index() -> Redirect {
     Redirect::to(uri!("/index.html", moldspec::list()))
 }
 
-#[launch]
-fn rocket() -> _ {
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
     rocket::build()
         .mount("/", routes![index])
         .mount(
@@ -36,4 +36,5 @@ fn rocket() -> _ {
             FileServer::new(relative!("static"), rocket::fs::Options::None),
         ).attach(model::stage())
         .attach(mail::stage())
+        .launch.await
 }

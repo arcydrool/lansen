@@ -20,7 +20,7 @@ pub(super) async fn create(
     post: Json<Contact>,
 ) -> Result<Created<Json<Contact>>> {
     // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
-    let result = Contact::create(db, post).await;
+    let result = Contact::create(db.into_inner(), post).await;
     match result {
         Ok(contact) => Ok(Created::new("/").body(Json(contact))),
         Err(e) => Err(e),

@@ -2,8 +2,11 @@
 use rocket::fairing::{self, AdHoc};
 use rocket::tokio::{task, time};
 use rocket::{Build, Rocket};
+use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Mutex;
 use std::time::Duration;
+
+use crate::model::Contact;
 
 static SINGLETON: Mutex<MailyTask> = Mutex::new(MailyTask::new());
 
@@ -33,14 +36,36 @@ impl MailyTask {
         });
         thread.value = match &thread.value {
             Some(_) => Some(forever),
-            None => Some(forever)
+            None => Some(forever),
         }
     }
-
 }
 
 async fn send_pending_emails() {
-    eprintln!("Doing something...");
+    let pool = SqlitePoolOptions::new()
+        .max_connections(1)
+        .connect("sqlite:db/sqlx/db.sqlite")
+        .await;
+    match pool {
+        Err(_) => return,
+        Ok(conn) => {
+            let conn =conn.acquire().await;
+            match conn {
+                Err(_) => return,
+                Ok(conn) => {
+                    let contact = Contact::find_raising_contact(conn).await;
+                    match contact {
+                        Err(_) => return,
+                        Ok(None) => return,
+                        Ok(Some(contact)) => {
+                            println!("{}",contact);
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
 }
 
 async fn start_maily(rocket: Rocket<Build>) -> fairing::Result {
