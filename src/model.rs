@@ -83,7 +83,9 @@ pub(crate) struct Contact {
     tel: String,
     interests: Vec<String>,
     additional: String,
+    #[serde(default = "Contact::raising_default")]
     raising: bool,
+    #[serde(default = "Contact::raised_default")]
     raised: bool,
 }
 
@@ -94,6 +96,13 @@ impl std::fmt::Display for Contact{
 }
 
 impl Contact {
+    pub fn raising_default () -> bool {
+        false
+    }
+
+    pub fn raised_default () -> bool {
+        false
+    }
     pub(crate) async fn create(mut db: PoolConnection<Sqlite>, post: Json<Contact>) -> Result<Contact> {
         // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
         let vinterests = post.interests.clone();
