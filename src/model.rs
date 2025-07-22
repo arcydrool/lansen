@@ -89,12 +89,6 @@ pub(crate) struct Contact {
     raised: bool,
 }
 
-impl std::fmt::Display for Contact{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.serialize(f)
-    }
-}
-
 impl Contact {
     pub fn raising_default () -> bool {
         false
@@ -130,7 +124,7 @@ impl Contact {
     }
 
     
-    pub(crate) async fn find(mut db: PoolConnection<Sqlite>, id: i64) -> Result<Contact> {
+    pub(crate) async fn find(db: &mut PoolConnection<Sqlite>, id: i64) -> Result<Contact> {
         let query = sqlx::query!(
             "
           select id, name, company, email, tel, interests, additional, raising, raised 
@@ -156,7 +150,7 @@ impl Contact {
             Err(e) => Err(rocket::response::Debug(e)),
         }
     }
-    pub(crate) async fn find_raising_contact(mut db: PoolConnection<Sqlite>) -> Result<Option<Contact>> {
+    pub(crate) async fn find_raising_contact(db: &mut PoolConnection<Sqlite>) -> Result<Option<Contact>> {
         let query = sqlx::query!(
             "
             update contact  
@@ -180,6 +174,26 @@ impl Contact {
                     }
                 }
             },
+        }
+    }
+
+    pub(crate) async fn mark_contact_raised(mut self, db: &mut PoolConnection<Sqlite>) -> Result<()> {
+        let query = sqlx::query!(
+            "
+update contact  
+  set raising = true, raised = true where id = ?
+            ",
+            self.id
+        );
+        let result = query.execute(db.acquire().await.unwrap()).await;
+
+        match result {
+            Err(e) => Err(rocket::response::Debug(e)),
+            Ok(_r) => {
+                self.raising = true;
+                self.raised = true; 
+                Ok(())
+            }
         }
     }
 }

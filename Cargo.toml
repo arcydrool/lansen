@@ -7,6 +7,7 @@ publish = false
 [dependencies]
 lettre = "0.11.17"
 rocket = { version = "0.5.1", features = ["json"] }
+serde = "1.0.219"
 
 [dependencies.sqlx]
 version = "0.7.4"
