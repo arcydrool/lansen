@@ -5,7 +5,7 @@ use rocket::Request;
 
 use rocket_db_pools::{sqlx, Connection};
 
-use crate::model::{Contact, Db};
+use model::{Contact, Db};
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
 

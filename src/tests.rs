@@ -70,5 +70,5 @@ fn test(base: &str, stage: AdHoc) {
 
 #[test]
 fn test_sqlx() {
-    test("/moldspec", crate::model::stage())
+    test("/moldspec", model::stage())
 }

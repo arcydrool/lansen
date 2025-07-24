@@ -15,7 +15,7 @@ type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
-pub(crate) struct QuotePost {
+pub struct QuotePost {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     id: Option<i64>,
     title: String,
@@ -25,7 +25,7 @@ pub(crate) struct QuotePost {
 }
 
 impl QuotePost {
-    pub(crate) async fn create(
+    pub async fn create(
         mut db: PoolConnection<Sqlite>,
         mut post: Json<QuotePost>,
     ) -> Result<Created<Json<QuotePost>>> {
@@ -42,7 +42,7 @@ impl QuotePost {
         post.id = Some(results.first().expect("returning results").id);
         return Ok(Created::new("/").body(post));
     }
-    pub(crate) async fn list(mut db: PoolConnection<Sqlite>) -> Result<Json<Vec<i64>>> {
+    pub async fn list(mut db: PoolConnection<Sqlite>) -> Result<Json<Vec<i64>>> {
         let ids = sqlx::query!("SELECT id FROM quote where raising = 0 and raised = 0")
             .fetch(db.acquire().await.unwrap())
             .map_ok(|record| record.id)
@@ -52,7 +52,7 @@ impl QuotePost {
         Ok(Json(ids))
     }
 
-    pub(crate) async fn read(mut db: PoolConnection<Sqlite>, id: i64) -> Option<Json<QuotePost>> {
+    pub async fn read(mut db: PoolConnection<Sqlite>, id: i64) -> Option<Json<QuotePost>> {
         sqlx::query!(
             "SELECT id, title, text, raising, raised FROM quote WHERE id = ?",
             id
@@ -74,7 +74,7 @@ impl QuotePost {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
-pub(crate) struct Contact {
+pub struct Contact {
     #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
     id: Option<i64>,
     name: String,
@@ -97,7 +97,7 @@ impl Contact {
     pub fn raised_default () -> bool {
         false
     }
-    pub(crate) async fn create(mut db: PoolConnection<Sqlite>, post: Json<Contact>) -> Result<Contact> {
+    pub async fn create(mut db: PoolConnection<Sqlite>, post: Json<Contact>) -> Result<Contact> {
         // NOTE: sqlx#2543, sqlx#1648 mean we can't use the pithier `fetch_one()`.
         let vinterests = post.interests.clone();
         let interests: String = post.interests.join(",");
@@ -124,7 +124,7 @@ impl Contact {
     }
 
     
-    pub(crate) async fn find(db: &mut PoolConnection<Sqlite>, id: i64) -> Result<Contact> {
+    pub async fn find(db: &mut PoolConnection<Sqlite>, id: i64) -> Result<Contact> {
         let query = sqlx::query!(
             "
           select id, name, company, email, tel, interests, additional, raising, raised 
@@ -150,7 +150,7 @@ impl Contact {
             Err(e) => Err(rocket::response::Debug(e)),
         }
     }
-    pub(crate) async fn find_raising_contact(db: &mut PoolConnection<Sqlite>) -> Result<Option<Contact>> {
+    pub async fn find_raising_contact(db: &mut PoolConnection<Sqlite>) -> Result<Option<Contact>> {
         let query = sqlx::query!(
             "
             update contact  
@@ -177,7 +177,7 @@ impl Contact {
         }
     }
 
-    pub(crate) async fn mark_contact_raised(mut self, db: &mut PoolConnection<Sqlite>) -> Result<()> {
+    pub async fn mark_contact_raised(mut self, db: &mut PoolConnection<Sqlite>) -> Result<()> {
         let query = sqlx::query!(
             "
 update contact  
@@ -197,7 +197,7 @@ update contact
         }
     }
 
-    pub(crate) async fn to_mail_body(&self) -> String {
+    pub async fn to_mail_body(&self) -> String {
         
         format!("{} -> {}", self.name, self.company )
     }
@@ -208,7 +208,7 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
         Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
             Ok(_) => Ok(rocket),
             Err(e) => {
-                error!("Failed to initialize SQLx database: {}", e);
+                rocket::error!("Failed to initialize SQLx database: {}", e);
                 Err(rocket)
             }
         },

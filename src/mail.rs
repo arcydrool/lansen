@@ -7,7 +7,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use crate::model::Contact;
+use model::Contact;
 
 #[derive(serde::Deserialize)]
 pub(crate) struct MailContact {

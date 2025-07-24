@@ -1,4 +1,4 @@
-use crate::model::{Db, QuotePost};
+use model::{Db, QuotePost};
 use rocket::response::status::Created;
 use rocket::serde::json::Json;
 

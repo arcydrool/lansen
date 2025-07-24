@@ -6,7 +6,6 @@ mod tests;
 
 mod contact;
 mod mail;
-mod model;
 mod moldspec;
 
 use rocket::fs::{relative, FileServer};
