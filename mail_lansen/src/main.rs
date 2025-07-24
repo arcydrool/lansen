@@ -4,11 +4,21 @@ use serde;
 use std::sync::Mutex;
 use rocket::tokio::{task, time};
 use std::time::Duration;
+use figment::{Figment, providers::{Format, Toml, Env}};
 
 use model::Contact;
 
 fn main()  {
-    ()
+    let figment = Figment::new()
+    .merge(Toml::file("App.toml"))
+    .merge(Env::prefixed("LANSEN_"));
+    let conf_result: Result<MailContact, figment::Error> = figment.extract();
+    match conf_result {
+        Err(e) => panic!("Lansen Maily Failed to Configure {}", e),
+        Ok(mail_contact) => {
+            ()
+        }
+    }
 }
 
 #[derive(serde::Deserialize)]

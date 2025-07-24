@@ -5,7 +5,6 @@ extern crate rocket;
 mod tests;
 
 mod contact;
-mod mail;
 mod moldspec;
 
 use rocket::fs::{relative, FileServer};
@@ -31,6 +30,4 @@ fn rocket() -> _ {
             FileServer::new(relative!("static"), rocket::fs::Options::None),
         )
         .attach(model::stage())
-        .attach(mail::stage())
-        .attach(rocket::fairing::AdHoc::config::<crate::mail::MailContact>() )
 }

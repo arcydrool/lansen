@@ -9,4 +9,5 @@ lettre = { workspace = true }
 sqlx = { workspace = true }
 rocket = { workspace = true }
 serde = {workspace = true}
+figment = { version = "0.10.19", features = ["env", "toml"] }
 
