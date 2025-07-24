@@ -33,4 +33,5 @@ fn rocket() -> _ {
         )
         .attach(model::stage())
         .attach(mail::stage())
+        .attach(rocket::fairing::AdHoc::config::<crate::mail::MailContact>() )
 }

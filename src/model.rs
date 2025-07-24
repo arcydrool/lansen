@@ -196,6 +196,11 @@ update contact
             }
         }
     }
+
+    pub(crate) async fn to_mail_body(&self) -> String {
+        
+        format!("{} -> {}", self.name, self.company )
+    }
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {

@@ -2,17 +2,17 @@
 use rocket::fairing::{self, AdHoc};
 use rocket::tokio::{task, time};
 use rocket::{Build, Rocket};
+use serde;
 use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Mutex;
 use std::time::Duration;
-use serde;
 
 use crate::model::Contact;
 
 #[derive(serde::Deserialize)]
-struct MailContact {
+pub(crate) struct MailContact {
     header: String,
-    port: u16,
+    to: String,
 }
 
 static SINGLETON: Mutex<MailyTask> = Mutex::new(MailyTask::new());
@@ -85,7 +85,7 @@ async fn send_pending_emails() {
                             println!("What contact");
                             let mark_conn = &mut cconn;
                             //let con_text = contact.to_string();
-                            println!("{:?}", &contact);
+                            println!("{}", contact.to_mail_body().await);
                             let r = contact.mark_contact_raised(mark_conn).await;
                             match r {
                                 Ok(_) => {
@@ -114,10 +114,4 @@ pub fn stage() -> AdHoc {
     AdHoc::on_ignite("Email Stage", |rocket| async {
         rocket.attach(AdHoc::try_on_ignite("Start Email", start_maily))
     })
-}
-
-impl Contact {
-    pub(crate) async fn to_mail_body(&self) -> String {
-        "".to_string()
-    }
 }
