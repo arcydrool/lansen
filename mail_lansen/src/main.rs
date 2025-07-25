@@ -1,76 +1,52 @@
-use lettre::transport::smtp::Error;
-use sqlx::sqlite::SqlitePoolOptions;
+use figment::{
+    Figment,
+    providers::{Env, Format, Toml},
+};
+use rocket::tokio::{self};
 use serde;
-use std::sync::Mutex;
-use rocket::tokio::{task, time};
-use std::time::Duration;
-use figment::{Figment, providers::{Format, Toml, Env}};
+use sqlx::sqlite::SqlitePoolOptions;
+use std::path::Path;
 
 use model::Contact;
 
-fn main()  {
-    let figment = Figment::new()
-    .merge(Toml::file("App.toml"))
-    .merge(Env::prefixed("LANSEN_"));
-    let conf_result: Result<MailContact, figment::Error> = figment.extract();
-    match conf_result {
-        Err(e) => panic!("Lansen Maily Failed to Configure {}", e),
-        Ok(mail_contact) => {
-            ()
-        }
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let m = Path::new("lansen.toml");
+    println!("exists {}", m.exists());
+
+    let config = configure().await;
+    if config.is_err() {
+        panic!("Lansen Maily Failed to Configure {}", config.unwrap_err());
     }
+    let config = config.unwrap();
+    send_pending_emails(config).await
+}
+
+async fn configure() -> Result<Configuration, figment::Error> {
+    let figment = Figment::new()
+        .merge(Toml::file("lansen.toml"))
+        .merge(Env::prefixed("LANSEN_"));
+    figment.extract()
 }
 
 #[derive(serde::Deserialize)]
-pub(crate) struct MailContact {
+#[derive(Debug)]
+pub(crate) struct Configuration {
     header: String,
     to: String,
 }
 
-static SINGLETON: Mutex<MailyTask> = Mutex::new(MailyTask::new());
-
-type TaskHandle = rocket::tokio::task::JoinHandle<()>;
-struct MailyTask {
-    value: Option<TaskHandle>,
-    keep_alive: bool,
-}
-
-impl MailyTask {
-    pub const fn new() -> Self {
-        MailyTask {
-            value: None,
-            keep_alive: true,
-        }
-    }
-
-    async fn launch() {
-        let mut thread: std::sync::MutexGuard<'_, MailyTask> = SINGLETON.lock().unwrap();
-
-        let forever = task::spawn(async {
-            let mut interval = time::interval(Duration::from_millis(10000));
-            while SINGLETON.lock().unwrap().keep_alive {
-                interval.tick().await;
-                send_pending_emails().await;
-            }
-        });
-        thread.value = match &thread.value {
-            Some(_) => Some(forever),
-            None => Some(forever),
-        }
-    }
-}
-
 //TODO: Unified Logging
-async fn send_pending_emails() {
+async fn send_pending_emails(config: Configuration) -> Result<(), Box<dyn std::error::Error>> {
     let pool = SqlitePoolOptions::new()
         .max_connections(1)
-        .connect("sqlite:db/sqlx/db.sqlite")
+        .connect("sqlite:model/db/sqlx/db.sqlite")
         .await;
     println!("Started Pool");
     match pool {
         Err(_) => {
             println!("pool is error");
-            return;
+            return Ok(());
         }
         Ok(conn) => {
             let conn = conn.acquire().await;
@@ -78,7 +54,7 @@ async fn send_pending_emails() {
             match conn {
                 Err(_) => {
                     println!("Pool conn is error");
-                    return;
+                    return Ok(());
                 }
                 Ok(mut cconn) => {
                     let get_conn = &mut cconn;
@@ -87,26 +63,26 @@ async fn send_pending_emails() {
                     match contact {
                         Err(_) => {
                             println!("Error finding contact");
-                            return;
+                            return Ok(());
                         }
                         Ok(None) => {
                             println!("No Contact Now");
-                            return;
+                            return Ok(());
                         }
                         Ok(Some(contact)) => {
                             println!("What contact");
                             let mark_conn = &mut cconn;
                             //let con_text = contact.to_string();
-                            println!("{}", contact.to_mail_body().await);
+                            println!("to: {}\n{}\n{}", config.to, config.header,contact.to_mail_body().await);
                             let r = contact.mark_contact_raised(mark_conn).await;
                             match r {
                                 Ok(_) => {
                                     println!("Marked sent");
-                                    return;
+                                    return Ok(());
                                 }
                                 Err(e) => {
                                     println!("{} Marking Complete", e.0);
-                                    return;
+                                    return Ok(());
                                 }
                             }
                         }
@@ -116,5 +92,3 @@ async fn send_pending_emails() {
         }
     }
 }
-
-

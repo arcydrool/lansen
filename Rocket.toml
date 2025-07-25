@@ -1,6 +1,2 @@
 [default.databases.sqlx]
 url = "db/sqlx/db.sqlite"
-
-[default]
-header = "sakdlfjasld"
-to = "sjkdlajlf"
