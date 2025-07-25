@@ -2,17 +2,18 @@ use figment::{
     Figment,
     providers::{Env, Format, Toml},
 };
-use rocket::tokio::{self};
+use rocket::{futures::future, tokio::{self}};
 use serde;
-use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::{pool::PoolConnection, sqlite::SqlitePoolOptions, Sqlite};
 use std::path::Path;
+use lettre::Message;
 
 use model::Contact;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let m = Path::new("lansen.toml");
-    println!("exists {}", m.exists());
+    dbg!("exists {}", m.exists());
 
     let config = configure().await;
     if config.is_err() {
@@ -38,57 +39,65 @@ pub(crate) struct Configuration {
 
 //TODO: Unified Logging
 async fn send_pending_emails(config: Configuration) -> Result<(), Box<dyn std::error::Error>> {
-    let pool = SqlitePoolOptions::new()
-        .max_connections(1)
-        .connect("sqlite:model/db/sqlx/db.sqlite")
-        .await;
-    println!("Started Pool");
-    match pool {
-        Err(_) => {
-            println!("pool is error");
-            return Ok(());
-        }
-        Ok(conn) => {
-            let conn = conn.acquire().await;
-            println!("Pool conn is acquired");
-            match conn {
-                Err(_) => {
-                    println!("Pool conn is error");
-                    return Ok(());
-                }
-                Ok(mut cconn) => {
-                    let get_conn = &mut cconn;
-                    let contact = Contact::find_raising_contact(get_conn).await;
-                    println!("Tried to find contact");
-                    match contact {
+    let pending_contact: Result<Option<Contact>, Box<dyn std::error::Error>> = first_pending(pending_contact).await;
+
+                    
+                    dbg!("Tried to find contact");
+                    match pending_contact {
                         Err(_) => {
-                            println!("Error finding contact");
+                            dbg!("Error finding contact");
                             return Ok(());
                         }
                         Ok(None) => {
-                            println!("No Contact Now");
+                            dbg!("No Contact Now");
                             return Ok(());
                         }
                         Ok(Some(contact)) => {
-                            println!("What contact");
+                            dbg!("What contact");
                             let mark_conn = &mut cconn;
                             //let con_text = contact.to_string();
-                            println!("to: {}\n{}\n{}", config.to, config.header,contact.to_mail_body().await);
-                            let r = contact.mark_contact_raised(mark_conn).await;
-                            match r {
-                                Ok(_) => {
-                                    println!("Marked sent");
+                            //dbg!("to: {}\n{}\n{}", config.to, config.header,contact.to_mail_body().await);
+                            let sent = send_email(&config,&contact).await;
+                            let marked = contact.mark_contact_raised(mark_conn).await;
+                            //handle two errors at once. Powerful.
+                            match (sent, marked) {
+                                (Ok(_),Ok(_)) => {
+                                    dbg!("Marked sent");
                                     return Ok(());
                                 }
-                                Err(e) => {
-                                    println!("{} Marking Complete", e.0);
-                                    return Ok(());
+                                (Err(e),_) => {
+                                    dbg!("{} Sending Email", & *e);
+                                    return Err(e);
+                                }
+                                (_,Err(e)) => {
+                                    dbg!("{} Marking Complete", &e.0);
+                                    return Err(Box::new(e.0));
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    }
+            
+
+async fn send_email(config: &Configuration,contact: &Contact) -> Result<(), Box<dyn std::error::Error>> {
+    let message = Message::builder();
+    Ok(())
+}
+
+
+
+async fn first_pending<T> (pending_fn: &dyn Future<Output = model::Result<Option<T>>) -> Result<Option<T>, Box<dyn std::error::Error>>{
+    let pool = SqlitePoolOptions::new()
+        .max_connections(1)
+        .connect("sqlite:model/db/sqlx/db.sqlite")
+        .await?;
+    dbg!("Started Pool");
+    let conn = pool.acquire().await?;
+     
+                    let get_conn = &mut conn;
+         pending_fn.await
+}
+
+async fn pending_contact(get_conn: PoolConnection<Sqlite>) ->  model::Result<Option<Contact>> {
+ Contact::find_raising_contact(get_conn).await
 }
