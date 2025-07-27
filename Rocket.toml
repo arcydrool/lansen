@@ -1,2 +1,6 @@
+[default]
+# uncomment to test on lan
+# address = "0.0.0.0"
+
 [default.databases.sqlx]
-url = "db/sqlx/db.sqlite"
+url = "model/db/sqlx/db.sqlite"
