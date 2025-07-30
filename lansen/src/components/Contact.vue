@@ -86,24 +86,26 @@ interface NoblePayload {
 }
 
 async function postJson(url: string, data: NoblePayload): Promise<Response> {
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json');
+
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: headers,
     body: JSON.stringify(data)
   });
 
   if (!response.ok) {
     throw new Error(`Blast! Our letter was not received favorably: ${response.statusText}`);
   }
+  console.log(response);
   return await response.json();
 }
 
 async function postContact(form: FormSubmitEvent): Promise<Response> {
   const payload: NoblePayload = { name: form.states.name?.value, email: form.states.email?.value, tel: form.states.tel?.value, company: form.states.company?.value, mail: form.states.mail?.value, interests: form.states.interests?.value, additional: form.states.additional?.value, };
   console.log(payload);
-  return await postJson("/c", payload);
+  return await postJson("/contact.php", payload);
 }
 </script>
 <template>

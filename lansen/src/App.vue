@@ -6,6 +6,8 @@ import Menu from './components/Menu.vue'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import Foot from './components/Foot.vue'
+import { Image } from 'primevue'
+import title from './assets/title.svg';
 
 const siteData = reactive({
   title: 'Lansen Mold - Custom injection molder; mold design, manufacturing and repair; molding ISO and ASTM test specimens',
@@ -33,6 +35,8 @@ useHead({
 <template>
   
   <main>
+    <div class="topbar"><Image :src="title" /></div>
+    <div class="topbox"></div>
     <Splitter class="mb-8">
       <SplitterPanel :size="12" :minSize="5">
         <Menu></Menu>
@@ -55,5 +59,18 @@ h1 {
 
 h2 {
   font-size: large;
+}
+
+.topbar{
+  display: inline flex;
+  position: fixed;
+  z-index: 1100;
+}
+
+.topbox{
+  width: 100vw;
+  height: 60px;
+  padding-block: 1;
+  background-color: var(--surface-ground);
 }
 </style>

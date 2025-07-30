@@ -2,17 +2,25 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { computed } from 'vue';
 import PanelMenu from 'primevue/panelmenu';
+import mhome from "./icons/mhome.svg";
+import mabout from "./assets/ico/mabout.svg";
+import mcustom from "./assets/ico/mcustom.svg";
+import minject from "./assets/ico/minject.svg";
+import mspec from "./assets/ico/mspec.svg";
+import mplaque from "./assets/ico/mplaque.svg";
+import mcontact from "./assets/ico/mcontact.svg";
+import mquote from "./assets/ico/mquote.svg";
 
 const items = computed(() => {
       return [
-        { route: "home", label: "Home" },
-        { route: "about", label: "About Us" },
-        { route: "mold", label: "Custom Mold" },
-        { route: "inject", label: "Injection Molding" },
-        { route: "specimen", label: "Specimen Molding" },
-        { route: "plaque", label: "Plaque Molding" },
-        { route: "contact", label: "Contact" },
-        { route: "quote", label: "Quote" },
+        { icon: "mhome", route: "home", label: "Home" },
+        { icon: "mabout", route: "about", label: "About Us" },
+        { icon: "mcustom", route: "mold", label: "Custom Mold" },
+        { icon: "minject", route: "inject", label: "Injection Molding" },
+        { icon: "mspec", route: "specimen", label: "Specimen Molding" },
+        { icon: "mplaque", route: "plaque", label: "Plaque Molding" },
+        { icon: "mcontact", route: "contact", label: "Contact" },
+        { icon: "mquote", route: "quote", label: "Quote" },
       ]
     })
 </script>
