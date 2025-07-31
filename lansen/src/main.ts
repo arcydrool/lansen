@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { createHead } from '@vueuse/head'
+import './assets/main.css';
 import PrimeVue from 'primevue/config';
 import Nora from '@primeuix/themes/nora';
 import { definePreset, palette } from '@primeuix/themes';
