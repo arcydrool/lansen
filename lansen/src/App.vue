@@ -37,14 +37,16 @@ useHead({
   <main>
     <div class="topbar"><Image :src="title" /></div>
     <div class="topbox"></div>
-    <Splitter class="mb-8">
-      <SplitterPanel :size="12" :minSize="5">
+    <span class="max-w-prose">
+    <Splitter class="mb-8" >
+      <SplitterPanel :size="12" :minSize="5" >
         <Menu></Menu>
       </SplitterPanel>
       <SplitterPanel>
         <RouterView />
       </SplitterPanel>
     </Splitter>
+    </span>
   </main>
   <Foot></Foot>
 </template>
@@ -68,7 +70,7 @@ h2 {
 }
 
 .topbox{
-  width: 100vw;
+  width: 100%;
   height: 60px;
   padding-block: 1;
   background-color: var(--surface-ground);
