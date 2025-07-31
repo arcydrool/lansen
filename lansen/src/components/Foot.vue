@@ -31,6 +31,7 @@ const cyear = computed(() => { return new Date().getFullYear() });
   text-align: center;
   font-family: Tahoma, Verdana, sans-serif;
   font-size: x-small;
+  max-width: 804px;
 }
 
 .copy {

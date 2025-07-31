@@ -37,16 +37,18 @@ useHead({
   <main>
     <div class="topbar"><Image :src="title" /></div>
     <div class="topbox"></div>
-    <span class="max-w-prose">
+    <div class="max-w-[807]">
     <Splitter class="mb-8" >
-      <SplitterPanel :size="12" :minSize="5" >
+      <SplitterPanel :size="7" :minSize="5" >
         <Menu></Menu>
       </SplitterPanel>
       <SplitterPanel>
+        <div class="max-w-prose">
         <RouterView />
+        </div>
       </SplitterPanel>
     </Splitter>
-    </span>
+    </div>
   </main>
   <Foot></Foot>
 </template>
