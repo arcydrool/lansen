@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
-import { Card, Button, InputText, InputMask, Textarea, Message, Checkbox, CheckboxGroup } from 'primevue';
+import { Card, Button, InputText, InputMask, Textarea, Message, Checkbox, CheckboxGroup, Chip } from 'primevue';
 import { Form, FormField, type FormSubmitEvent } from '@primevue/forms';
 
 const state = reactive({ summary: "", severity: "" });

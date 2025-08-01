@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card } from 'primevue';
+import { Card, Chip } from 'primevue';
 import { ref, reactive } from 'vue';
 import ProgressSpinner from 'primevue/progressspinner';
 
@@ -22,7 +22,7 @@ const mailLink = ref('info' + '@'.repeat(1) + 'lansen.com');
         <li>Reach us by phone. Call 413-443-5328 and ask for Kari Kristensen.
         </li>
         <li>Reach us via E-mail.
-          <a v-bind:href="'mailto:' + mailLink">{{ mailLink }}</a>
+          <Chip><a v-bind:href="'mailto:' + mailLink">{{ mailLink }}</a></Chip>
         </li>
         <li>Request a quote.
           <GoForm />
