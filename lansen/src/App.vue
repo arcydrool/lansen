@@ -6,7 +6,7 @@ import Menu from './components/Menu.vue'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import Foot from './components/Foot.vue'
-import { Image } from 'primevue'
+import { Image, Card } from 'primevue'
 import title from './assets/title.svg';
 
 const siteData = reactive({
@@ -35,8 +35,9 @@ useHead({
 <template>
   
   <main>
-    <div class="topbar"><Image :src="title" /></div>
+    <div class="topbar"><Card><template #content><Image :src="title"></Image></template></Card></div>
     <div class="topbox"></div>
+    <div class="ct">
     <div class="max-w-[807]">
     <Splitter class="mb-8" >
       <SplitterPanel :size="7" :minSize="5" >
@@ -48,9 +49,11 @@ useHead({
         </div>
       </SplitterPanel>
     </Splitter>
-    </div>
+    </div></div>
   </main>
+  <div class="ct">
   <Foot></Foot>
+  </div>
 </template>
 <style>
 body {
@@ -69,12 +72,19 @@ h2 {
   display: inline flex;
   position: fixed;
   z-index: 1100;
+  left: 50%;
+  transform: translate(-50%,0%);
 }
 
 .topbox{
   width: 100%;
-  height: 60px;
+  height: 80px;
   padding-block: 1;
   background-color: var(--surface-ground);
+}
+
+.ct {
+  display: flex;
+  justify-content: center;
 }
 </style>

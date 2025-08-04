@@ -11,7 +11,7 @@ const app = createApp(App)
 const head = createHead()
 
 
-const myPal = palette('#1f1318');
+const myPal = palette('#f69089');
 
 const MyPreset = definePreset(Nora, {
     semantic: {
