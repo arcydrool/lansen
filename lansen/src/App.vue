@@ -71,6 +71,7 @@ h2 {
 .topbar{
   display: inline flex;
   position: fixed;
+  height: 80px;
   z-index: 1100;
   left: 50%;
   transform: translate(-50%,0%);
