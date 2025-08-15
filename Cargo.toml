@@ -2,6 +2,7 @@
 name = "lansen"
 version = "0.1.0"
 edition = "2021"
+authors = ["Adam Hartline <adam.hartline@gmail.com>"]
 publish = false
 
 [dependencies]
